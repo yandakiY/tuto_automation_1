@@ -1,9 +1,11 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By 
+import pandas as pd
 
 
 website = 'https://www.thesun.co.uk/sport/football/'
-path = "./chrome-win64"
+path = "/chrome-win64"
 
 
 # # instance service 
@@ -17,16 +19,31 @@ driver.get(website)
 
 
 # find specify element
-containers = driver.find_elements(by='xpath' , value="//div[@class = 'teaser__copy-container']")
+containers = driver.find_elements(by=By.XPATH , value="//div[@class = 'teaser__copy-container']/.")
 
-list_title = []
+titles = []
+sub_titles = []
+links = []
 
 
 for container in containers:
 
-    title = driver.find_element(by='xpath' , value="./a/span[contains(@class , 'teaser__headline')]").text
-    sub_title = driver.find_element(by='xpath' , value="./a/h3").text
-    link = driver.find_element(by='xpath' , value='./a').get_attribute('href')
-    #  list_title.append(title)
+    # print(container.text)
+    # container.find_element
+    title = container.find_element(by=By.XPATH , value='./a/span').text
+    sub_title = container.find_element(by=By.XPATH , value='./a/h3').text
+    link = container.find_element(by=By.XPATH , value='./a').get_attribute('href')
+    
+    
+    titles.append(title)
+    sub_titles.append(sub_title)
+    links.append(link)
 
-print(containers.count())
+
+my_dict = {'titles': titles , 'sub_titles': sub_titles , 'links': links}
+
+df_news = pd.DataFrame(my_dict)
+
+df_news.to_csv('df_news.csv')
+
+driver.quit()
